@@ -1,0 +1,10 @@
+*.log
+*.aux
+*.rar
+*.zip
+*.out
+*.swo
+*.swp
+*.gz
+*.doc
+*.cl~

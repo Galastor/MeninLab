@@ -1,0 +1,3 @@
+(defvar *game*)
+
+(defvar *exit*)

@@ -26,4 +26,3 @@
 
 (defclass command () ())
 
-(defgeneric use (command))

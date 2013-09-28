@@ -1,0 +1,9 @@
+
+((:NAME "Скелет" :MIN-LVL 1 :MAX-LVL 4 :HEALTH 10) 
+(:NAME "Человекокрыс" :MIN-LVL 1 :MAX-LVL 2 :HEALTH 8)
+(:NAME "Зомби" :MIN-LVL 3 :MAX-LVL 7 :HEALTH 11)
+(:NAME "Кролик" :MIN-LVL 1 :MAX-LVL 1 :HEALTH 6)
+(:NAME "Голодный хэдкраб" :MIN-LVL 5 :MAX-LVL 7 :HEALTH 9)
+(:NAME "Подкустовый выползень" :MIN-LVL 4 :MAX-LVL 19 :HEALTH 12)
+(:NAME "Дракон" :MIN-LVL 10 :MAX-LVL 10000 :HEALTH 100)
+(:NAME "Полуорк" :MIN-LVL 7 :MAX-LVL 15 :HEALTH 13)) 

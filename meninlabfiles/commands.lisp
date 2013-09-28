@@ -21,41 +21,40 @@
 (defcommand walk-com ())
 
 (defmethod use ((command walk-com))
-  (setf (enemy *game*) (make-instance `creature :name "Скелет" :health (+ (* 8 (level (player *game*))) 
-									  (random (* 4 (level (player *game*)))))))
-  (setf (mode *game*) 2)
-  (format *query-io* "Навстречу выходит ~a, имеющий ~a очков здоровья~%" (name (enemy *game*)) (health (enemy *game*))))
+  (if (= (mode *game*) 2)
+    (format *query-io* "Вы слишком заняты боем, чтобы идти дальше~%")
+    (progn
+      (setf (mode *game*) 2)
+      (let ((enemy-list (remove-if-not 
+			  #'(lambda (x) (<= (getf x :min-lvl) (level (player *game*)) (getf x :max-lvl))) *monsters*)))
+	(let ((enemy (elt enemy-list (random (length enemy-list)))))
+	  (setf (enemy *game*)
+		(make-instance `creature :name (getf enemy :name) 
+			       		 :health (* (getf enemy :health) (level (player *game*)))))))
+      (format *query-io* "Навстречу выходит ~a, имеющий ~a очков здоровья~%" 
+	      (name (enemy *game*)) (health (enemy *game*))))))
 
 (defcommand heal-com ())
 
 (defmethod use ((command heal-com))
-  (let ((heal (random 4)))
-    (setf (health (player *game*)) (min (* 10 (level (player *game*))) (+ (health (player *game*)) heal)))
-    (format *query-io* "Вы излечились на ~a. Текущее здоровье: ~a~%" heal (health (player *game*)))))
+  (if (= (mode *game*) 1)
+    (progn
+      (setf (health (player *game*)) (* 10 (level (player *game*))))
+      (format *query-io* "Вы полностью излнчились~%"))
+    (format *query-io* "Вы слишком заняты боем, чтобы лечиться~%")))
 
 (defcommand kick-com ())
 
 (defmethod use ((command kick-com))
   (if (= (mode *game*) 2)
-    (let ((damage (random 4)))
-      (decf (health (enemy *game*)) damage)
-      (incf (expa (player *game*)) damage)
-      (format *query-io* "Вы нанесли противнику ~a урона (~a)~%" damage (health (enemy *game*)))
-      (when (>= (expa (player *game*)) (* 100 (level (player *game*))))
-	(decf (expa (player *game*)) (* 100 (level (player *game*))))
-	(incf (level (player *game*)))
-	(setf (health (player *game*)) (* 10 (level (player *game*))))	
-	(format *query-io* "Вы достигли нового уровня!~%"))
+    (progn
+      (kick (player *game*) (enemy *game*))
+      (if (>= (expa (player *game*)) (* 100 (level (player *game*))))
+	(lvl-up (player *game*)))
       (if (> (health (enemy *game*)) 0)
-	(let ((damage (random 4)))
-	  (decf (health (player *game*)) damage)
-	  (format *query-io* "Противник нанес ~a урона (~a)~%" damage (health (player *game*)))
-	  (when (< (health (player *game*)) 1)
-	    (format *query-io* "Смерть пришла за тобой, ~a, когда ты достиг ~a уровня.~%" 
-		    (name (player *game*)) (level (player *game*)))
-	    (setf *exit* t)))
+	(kick (enemy *game*) (player *game*))
 	(progn
-	  (format *query-io* "Противник погиб~%")
+	  (format *query-io* "~a погиб~%" (name (enemy *game*)))
 	  (setf (mode *game*) 1))))
     (format *query-io* "Вы ни с кем не сражаетесь~%")))
 
@@ -66,16 +65,11 @@
     (if (= (random 2) 1)
       (let ((loseexp (* (level (player *game*)) 5)))
 	(format *query-io* "Вы сбегаете и теряет ~a очков опыта~%" loseexp)
-	(decf (expa (player *game*)) loseexp))
-      (progn 
+	(decf (expa (player *game*)) loseexp)
+	(setf (mode *game*) 1))
+      (progn
 	(format *query-io* "Убежать не удалось~%")
-	(let ((damage (random 4)))
-	  (decf (health (player *game*)) damage)
-	  (format *query-io* "Противник нанес ~a урона (~a)~%" damage (health (player *game*)))
-	  (when (< (health (player *game*)) 1)
-	    (format *query-io* "Смерть пришла за тобой, ~a, когда ты достиг ~a уровня.~%" 
-		    (name (player *game*)) (level (player *game*)))
-	    (setf *exit* t)))))
+	(kick (enemy *game*) (player *game*))))
     (format *query-io* "Вы ни с кем не сражаетесь.~%")))
 
 (defcommand enemy-info-com ())

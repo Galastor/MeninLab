@@ -3,9 +3,23 @@
   (force-output *query-io*) 
   (read-line *query-io*))
 
-(defun roll (x)
-  (+ (mod (+ (get-internal-real-time) (random x)) x) 1)) ;;заменить на нормальный рандом
+(defun defmonster (name min-lvl max-lvl health)
+  (list :name name :min-lvl min-lvl :max-lvl max-lvl :health health))
 
+(defun add-monster (monster)
+  (push monster *monsters*))
+
+(defun save-monstesr-db ()
+  (with-open-file (out (concatenate 'string *folder* "meninlabfiles/monsters.db")
+		   :direction :output
+		   :if-exists :supersede)
+    (with-standard-io-syntax
+      (print *monsters* out))))
+
+(defun load-monsters-db ()
+  (with-open-file (in (concatenate 'string *folder* "meninlabfiles/monsters.db"))
+    (with-standard-io-syntax
+      (setf *monsters* (read in)))))
 
 (defun create-player ()
   (make-instance `player :health 10 :name (promt-read "Введите имя персонажа")))
@@ -25,9 +39,9 @@
 
 (defun play ()
   (setf *exit* ())
+  (load-monsters-db)
   (setf *game* (make-instance `game :player (create-player)))
   (format *query-io* "Добро пожаловать в игру \"Игра\"~%Для справки наберите \"помощь\" или \"?\"~%")
     (loop
       (use (read-command))
       (if *exit* (return))))
-

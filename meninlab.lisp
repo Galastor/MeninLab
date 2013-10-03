@@ -1,12 +1,10 @@
-(defparameter *folder* "d:/lispprojects/MeninLab/")
+(load (pathname "meninlabfiles/macroses.lisp"))
+(load (pathname "meninlabfiles/constants.lisp"))
+(load (pathname "meninlabfiles/classes.lisp"))
+(load (pathname "meninlabfiles/methods.lisp"))
+(load (pathname "meninlabfiles/commands.lisp"))
+(load (pathname "meninlabfiles/functions.lisp"))
+(load-monsters-db)
 
-(load (concatenate 'string *folder* "meninlabfiles/macroses.lisp"))
-(load (concatenate 'string *folder* "meninlabfiles/constants.lisp"))
-(load (concatenate 'string *folder* "meninlabfiles/classes.lisp"))
-(load (concatenate 'string *folder* "meninlabfiles/methods.lisp"))
-(load (concatenate 'string *folder* "meninlabfiles/commands.lisp"))
-(load (concatenate 'string *folder* "meninlabfiles/functions.lisp"))
+(menu)
 
-(setf *random-state* (make-random-state t))
-
-(play)

@@ -8,6 +8,7 @@
 \"ударить\" - нанести удар противнику (во время боя)
 \"убежать\" - сбежать из боя
 \"противник\" - посмотреть информацию о противнике
+\"сохранить\" - сохранить игру (предыдущее сохранение будет удалено!)
 \"выход\" - выход из игры
 любая другая команда - получение сообщения об ошибке
 Автор: Galastor~%"))
@@ -16,7 +17,8 @@
 
 (defmethod use ((command info-com))
   (let ((player (player *game*)))
-    (format *query-io* "~a~%Уровень(опыт): ~a(~a)~%Здоровье: ~a~%" (name player) (level player) (expa player) (health player))))
+    (format *query-io* "~a~%Уровень(опыт): ~a(~a)~%Здоровье: ~a~%Сила: ~a~%Выносливость: ~a~%" 
+	    (name player) (level player) (expa player) (health player) (strength player) (vitality player))))
 
 (defcommand walk-com ())
 
@@ -30,7 +32,11 @@
 	(let ((enemy (elt enemy-list (random (length enemy-list)))))
 	  (setf (enemy *game*)
 		(make-instance `creature :name (getf enemy :name) 
-			       		 :health (* (getf enemy :health) (level (player *game*)))))))
+			       		 :strength (+ (getf enemy :str) 
+						      (* (getf enemy :str-lvl) (level (player *game*))))
+					 :vitality (+ (getf enemy :vit) 
+						      (* (getf enemy :vit-lvl) (level (player *game*))))))))
+      (setf (health (enemy *game*)) (* 10 (vitality (enemy *game*))))
       (format *query-io* "Навстречу выходит ~a, имеющий ~a очков здоровья~%" 
 	      (name (enemy *game*)) (health (enemy *game*))))))
 
@@ -39,8 +45,8 @@
 (defmethod use ((command heal-com))
   (if (= (mode *game*) 1)
     (progn
-      (setf (health (player *game*)) (* 10 (level (player *game*))))
-      (format *query-io* "Вы полностью излнчились~%"))
+      (setf (health (player *game*)) (* 10 (vitality (player *game*))))
+      (format *query-io* "Вы полностью излечились~%"))
     (format *query-io* "Вы слишком заняты боем, чтобы лечиться~%")))
 
 (defcommand kick-com ())
@@ -76,13 +82,31 @@
 
 (defmethod use ((command enemy-info-com))
   (if (= (mode *game*) 2)
-    (format *query-io* "~a~%Здоровье: ~a~%" (name (enemy *game*)) (health (enemy *game*)))
+    (format *query-io*"~a~%Здоровье: ~a~%Сила: ~a~%Выносливость: ~a~%" (name (enemy *game*)) (health (enemy *game*)) 
+	    							       (strength (enemy *game*)) (vitality (enemy *game*)))
     (format *query-io* "Вы ни с кем не сражаетесь.~%")))
 
 (defcommand exit-com ())
 
 (defmethod use ((command exit-com))
   (setf *exit* t))
+
+(defcommand save-com ())
+
+(defmethod use ((command save-com))
+  (if (= (mode *game*) 1)
+    (progn (with-open-file (out (ensure-directories-exist "mlsaves/meninlab.save")
+				:direction :output :if-exists :supersede)
+	     (with-standard-io-syntax 
+	       (print (list 
+			:name (name (player *game*))
+			:health (health (player *game*))
+			:strength (strength (player *game*))
+			:vitality (vitality (player *game*))
+			:level (level (player *game*))
+			:expa (expa (player *game*))) out)))
+	   (format *query-io* "Игра успешно сохранена~%"))
+    (Format *query-io* "Вы слишком заняты боем~%")))
 
 (defcommand exception-com ((ecode :initarg :ecode :reader ecode)))
 

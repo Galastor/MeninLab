@@ -4,15 +4,23 @@
      :reader name)
    (health
      :initarg :health
-     :accessor health)))
+     :accessor health)
+   (strength
+     :initarg :strength
+     :accessor strength)
+   (vitality
+     :initarg :vitality
+     :accessor vitality)))
 
 (defclass player (creature)
   ((level
      :initform 1
-     :accessor level)
+     :accessor level
+     :initarg :level)
    (expirience
      :initform 0
-     :accessor expa)))
+     :accessor expa
+     :initarg :expa)))
 
 (defclass game ()
   ((player

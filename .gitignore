@@ -1,3 +1,6 @@
 *.lisp~
 *.swp
 *.cl~
+*.db~
+*.rtf
+*.save~

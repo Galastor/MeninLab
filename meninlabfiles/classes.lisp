@@ -1,7 +1,28 @@
+(defclass item ()
+  ((name
+     :initarg :name
+     :reader name)))
+
+(defclass weapon (item)
+  ((name 
+     :initform "руки")
+   (description
+     :initarg :description
+     :initform "1d2"
+     :reader description)
+   (damage
+     :initarg :damage
+     :initform (list :d2 1)
+     :reader damage)))
+
 (defclass creature ()
   ((name
      :initarg :name
      :reader name)
+   (level
+     :initform 1
+     :accessor level
+     :initarg :level)
    (health
      :initarg :health
      :accessor health)
@@ -10,17 +31,21 @@
      :accessor strength)
    (vitality
      :initarg :vitality
-     :accessor vitality)))
+     :accessor vitality)
+   (weapon
+     :initarg :weapon
+     :initform (make-instance `weapon)
+     :accessor weapon)
+   (gold
+     :initform 0
+     :initarg :gold
+     :accessor gold)))
 
 (defclass player (creature)
-  ((level
-     :initform 1
-     :accessor level
-     :initarg :level)
-   (expirience
+  ((expirience
      :initform 0
-     :accessor expa
-     :initarg :expa)))
+     :accessor expirience
+     :initarg :expirience)))
 
 (defclass game ()
   ((player
@@ -33,4 +58,18 @@
      :accessor mode)))
 
 (defclass command () ())
+
+(defclass game-room ()
+  ((index
+     :initarg :index
+     :reader :index)
+   (name
+     :initarg :name
+     :reader name)
+   (description
+     :initarg :description
+     :accessor description)
+   (exits
+     :initarg :exits
+     :accessor exits)))
 

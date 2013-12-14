@@ -4,7 +4,7 @@
 (load (pathname "meninlabfiles/methods.lisp"))
 (load (pathname "meninlabfiles/commands.lisp"))
 (load (pathname "meninlabfiles/functions.lisp"))
+(load (pathname "zones/zones.lisp"))
 (load-monsters-db)
 
 (menu)
-
